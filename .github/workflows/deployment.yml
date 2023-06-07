@@ -1,0 +1,46 @@
+name: Deployment
+on: push
+jobs:
+  # lint_and_test:
+  #     runs-on: ubuntu-latest
+  #     steps:
+  #         - name: Get code
+  #           uses: actions/checkout@v3
+  eslint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get code
+        uses: actions/checkout@v3
+      - name: install node v18
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - name: yarn install
+        run: yarn install
+      - name: eslint
+        uses: icrawl/action-eslint@v1
+        # only if a different glob is needed, default: src
+    #   with:
+    #     custom-glob: apps
+  test:
+    needs: eslint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: install node v18
+        uses: actions/setup-node@v3
+      - name: install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Code
+        uses: actions/checkout@v3
+      - name: install dependencies
+        run: npm ci
+      - name: Run build
+        run: npm run build
